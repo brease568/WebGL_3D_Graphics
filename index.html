@@ -14,7 +14,7 @@
       
 -->
 <head>
-<title>Kicking the Soccer Ball</title>
+<title>Scarecrow in a Field</title>
 <style>
     body {
         background-color: #EEEEEE;
@@ -26,7 +26,6 @@
 </style>
 
 <!-- This shader is exactly as provided -->
-
 <script type="x-shader/x-vertex" id="vshader-source">
     attribute vec3 a_coords;
     attribute vec3 a_normal;   
@@ -126,7 +125,6 @@ var gl;   // The webgl context.
 
 var xval=-6.0;
 var yval= 7.0;
-var kval = 90; // Kick leg start
 
 var a_coords_loc;         // Location of the a_coords attribute variable in the shader program.
 var a_normal_loc;         // Location of a_normal attribute 
@@ -147,6 +145,7 @@ var normalMatrix = mat3.create();  // matrix, derived from modelview matrix, for
 var rotator;  // A TrackballRotator to implement rotation by mouse.
 
 var frameNumber = 0;  // frame number during animation (actually only goes up by 0.5 per frame)
+var wheatHeight = 9.0; //initial height of the wheat in the field
 
 var torus, sphere, cone, cylinder, disk, ring, cube;  // basic objects, created using function createModel
 
@@ -164,16 +163,13 @@ function draw() {
     gl.clearColor(0,0,0,1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    
-    
     mat4.perspective(projection, Math.PI/2.5, 1, 1, 100);
     gl.uniformMatrix4fv(u_projection, false, projection );
 
     modelview = rotator.getViewMatrix();
     
     lights();
-    
-    boxman();
+    createWorld();
 }
 
 
@@ -197,58 +193,26 @@ function lights() {
     gl.uniform3f( u_lights[2].color, 1.0,0.0,1.0 );  
     
     currentColor = [ 0.3, 0.3, 0.3, 1 ];
-    
-    //pushMatrix();  
-    //mat4.translate(modelview,modelview,[xval,yval,1]);// 
-    //mat4.scale(modelview,modelview,[0.6,0.6,0.6]);
-    
-    //gl.uniform3f( u_material.emissiveColor, 0.7, 0.7, 0 );
-     // SHow the soccer ball
-    //sphere.render();
-    // Modifying this material will change the Boxman look
-    //gl.uniform3f( u_material.emissiveColor, 0, 0, 0 );
-    //popMatrix();  
-
-    //testing here:
-    // pushMatrix();  
-    // mat4.translate(modelview,modelview,[3.0,5.0,1]);// 
-    // mat4.scale(modelview,modelview,[0.6,0.6,0.6]);
-    // gl.uniform3f( u_material.emissiveColor, 0.4, 0.4, 0.4);
-    // sphere.render();
-    // gl.uniform3f( u_material.emissiveColor, 0, 0, 0 );
-    // popMatrix();
-
-    // pushMatrix();  
-    // mat4.translate(modelview,modelview,[2.1,5.4,1]);// 
-    // mat4.scale(modelview,modelview,[0.2,0.2,0.2]);
-    // gl.uniform3f( u_material.emissiveColor, 1, 1, 1);
-    // sphere.render();
-    // gl.uniform3f( u_material.emissiveColor, 0, 0, 0 );
-    // popMatrix();
-   
 }
 
 /**
- * Draws a boxman figure using transformation from cubes and cylinders.
- * Note for every push their should be a pop. This resets the transformations
+ * Creates the 3D word. Creates a scarecrow, a wheatfield, a sun, and two moons.
  */
-function boxman() {
-
-    //testing doing the sun here:
+function createWorld() {
+    //Create the sun
     pushMatrix();  
     mat4.translate(modelview,modelview,[xval,yval,1]);// 
     mat4.scale(modelview,modelview,[0.6,0.6,0.6]);
     gl.uniform3f( u_material.emissiveColor, 0.7, 0.7, 0 );
-    //Show the sun
     sphere.render();
-    // Modifying this material will change the Boxman look
+    // Modifying this material will change the scarecrow look
     gl.uniform3f( u_material.emissiveColor, 0, 0, 0 );
     popMatrix();
 
-    //Testing adding code here for sun rays:
+    //Adding code here for sun rays:
     pushMatrix();
-	mat4.translate(modelview,modelview,[-9,7,1.0]);
-	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[0,1,0]);
+	mat4.translate(modelview,modelview,[-6,7,1.0]);
+	mat4.rotate(modelview,modelview,(frameNumber+90)/180*Math.PI,[0,-1,0]);
 	mat4.scale(modelview,modelview,[0.3,0.3,1.0]);
 	currentColor = [0.9,1.0,0.0,1];
 	cylinder.render();
@@ -256,15 +220,15 @@ function boxman() {
 
     pushMatrix();
 	mat4.translate(modelview,modelview,[-6,7,1.0]);
-	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[0,1,0]);
+	mat4.rotate(modelview,modelview,(-frameNumber+90)/180*Math.PI,[0,1,0]);
 	mat4.scale(modelview,modelview,[0.3,0.3,1.0]);
 	currentColor = [0.9,1.0,0.0,1];
 	cylinder.render();
 	popMatrix();
 
     pushMatrix();
-	mat4.translate(modelview,modelview,[-6,9.8,1.0]);
-	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
+	mat4.translate(modelview,modelview,[-6,6.8,1.0]);
+	mat4.rotate(modelview,modelview,(frameNumber+90)/180*Math.PI,[-1,0,0]);
 	mat4.scale(modelview,modelview,[0.3,0.3,1.0]);
 	currentColor = [0.9,1.0,0.0,1];
 	cylinder.render();
@@ -272,14 +236,14 @@ function boxman() {
 
     pushMatrix();
 	mat4.translate(modelview,modelview,[-6,7.2,1.0]);
-	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
+	mat4.rotate(modelview,modelview,(-frameNumber+90)/180*Math.PI,[1,0,0]);
 	mat4.scale(modelview,modelview,[0.3,0.3,1.0]);
 	currentColor = [0.9,1.0,0.0,1];
 	cylinder.render();
 	popMatrix();
-    // End of testing code for sun rays
+    // End of code for sun rays
 
-    //testing the moon here:
+    //Adding moons here:
     pushMatrix();  
     mat4.translate(modelview,modelview,[6.0, 8.0,1]);// 
     mat4.scale(modelview,modelview,[0.6,0.6,0.6]);
@@ -289,24 +253,21 @@ function boxman() {
     popMatrix();
 
     pushMatrix();  
-    mat4.translate(modelview,modelview,[5.1,8.6,1]);// 
+    mat4.translate(modelview,modelview,[5.1,8.6,1]);
     mat4.scale(modelview,modelview,[0.2,0.2,0.2]);
-    gl.uniform3f( u_material.emissiveColor, 1, 1, 1);
+    gl.uniform3f( u_material.emissiveColor, 0, 1, 1);
     sphere.render();
     gl.uniform3f( u_material.emissiveColor, 0, 0, 0 );
     popMatrix();
 
-
-    //testing adding the head here:
+    //Adding the scarecrow head here:
 	pushMatrix();
 	mat4.translate(modelview,modelview,[-1,3.1,0]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
     mat4.scale(modelview,modelview,[0.7,0.7,0.7]);
 	currentColor = [0.9,0.4,0.1,1];
     sphere.render();
-	//cube.render();
 	popMatrix();
-
 
 	// Neck
 	pushMatrix();
@@ -316,24 +277,6 @@ function boxman() {
 	currentColor = [0.9,0.4,0.1,1];
 	cylinder.render();
 	popMatrix();
-
-    //Testing adding code here for sun rays:
-    // pushMatrix();
-	// mat4.translate(modelview,modelview,[-4,4.9,1.0]);
-	// mat4.rotate(modelview,modelview,(90)/180*Math.PI,[0,1,0]);
-	// mat4.scale(modelview,modelview,[0.3,0.3,1.0]);
-	// currentColor = [0.9,1.0,0.0,1];
-	// cylinder.render();
-	// popMatrix();
-
-    // pushMatrix();
-	// mat4.translate(modelview,modelview,[-7,4.9,1.0]);
-	// mat4.rotate(modelview,modelview,(90)/180*Math.PI,[0,1,0]);
-	// mat4.scale(modelview,modelview,[0.3,0.3,1.0]);
-	// currentColor = [0.9,1.0,0.0,1];
-	// cylinder.render();
-	// popMatrix();
-    // End of testing code for sun rays
 
 	// Body
 	pushMatrix();
@@ -362,7 +305,7 @@ function boxman() {
 	popMatrix();	
 	
     
-    // Legs
+    // Stick leg
 	pushMatrix();
 	mat4.translate(modelview,modelview,[-1.0,2.2,0]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
@@ -371,7 +314,7 @@ function boxman() {
 	cylinder.render();
 	popMatrix();
 
-    //adding the plane:
+    //Adding the 'grass' plane:
     pushMatrix();
 	mat4.translate(modelview,modelview,[0,-4,1]);
     mat4.scale(modelview,modelview,[25,0.5,25]);
@@ -379,7 +322,7 @@ function boxman() {
 	cube.render();
 	popMatrix();
 
-    //adding two planes that will act as dirt fields:
+    //Adding two planes that will act as dirt fields:
     pushMatrix();
 	mat4.translate(modelview,modelview,[5,-3.7,1]);
     mat4.scale(modelview,modelview,[5,0.5,15]);
@@ -394,11 +337,11 @@ function boxman() {
 	cube.render();
 	popMatrix();
 
-    //adding wheat to the field:
+    //Adding wheat to the field:
     pushMatrix();
 	mat4.translate(modelview,modelview,[-6.5, 6, 1]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[.6,.6,5.0]);
+	mat4.scale(modelview,modelview,[.6,.6,wheatHeight]);
 	currentColor = [0.0,1.0,0.1,1];
 	cylinder.render();
 	popMatrix();
@@ -406,7 +349,7 @@ function boxman() {
     pushMatrix();
 	mat4.translate(modelview,modelview,[-6.5, 6, 4]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[.6,.6,5.0]);
+	mat4.scale(modelview,modelview,[.6,.6,wheatHeight]);
 	currentColor = [0.0,1.0,0.1,1];
 	cylinder.render();
 	popMatrix();
@@ -414,7 +357,7 @@ function boxman() {
     pushMatrix();
 	mat4.translate(modelview,modelview,[-6.5, 6, -3]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[.6,.6,5.0]);
+	mat4.scale(modelview,modelview,[.6,.6,wheatHeight]);
 	currentColor = [0.0,1.0,0.1,1];
 	cylinder.render();
 	popMatrix();
@@ -422,7 +365,7 @@ function boxman() {
     pushMatrix();
 	mat4.translate(modelview,modelview,[5, 6, 1]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[.6,.6,5.0]);
+	mat4.scale(modelview,modelview,[.6,.6,wheatHeight]);
 	currentColor = [0.0,1.0,0.1,1];
 	cylinder.render();
 	popMatrix();
@@ -430,7 +373,7 @@ function boxman() {
     pushMatrix();
 	mat4.translate(modelview,modelview,[5, 6, 4]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[.6,.6,5.0]);
+	mat4.scale(modelview,modelview,[.6,.6,wheatHeight]);
 	currentColor = [0.0,1.0,0.1,1];
 	cylinder.render();
 	popMatrix();
@@ -438,24 +381,11 @@ function boxman() {
     pushMatrix();
 	mat4.translate(modelview,modelview,[5, 6, -3]);
 	mat4.rotate(modelview,modelview,(90)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[.6,.6,5.0]);
+	mat4.scale(modelview,modelview,[.6,.6,wheatHeight]);
 	currentColor = [0.0,1.0,0.1,1];
 	cylinder.render();
 	popMatrix();
-
-
-	//old leg for kicking - remove??
-	mat4.translate(modelview,modelview,[-0.5,3.1,0]);
-	// Kval provides for rotating about x-axis providing a foot kicking simulation
-	mat4.rotate(modelview,modelview,(kval)/180*Math.PI,[1,0,0]);
-	mat4.scale(modelview,modelview,[0.6,0.6,3.0]);
-	currentColor = [0.0,1.0,0.1,1];
-	//cylinder.render();
-	popMatrix();	
-	  	
-}
-
-
+} //end of createWorld()
 
 
 /**
@@ -465,7 +395,6 @@ function pushMatrix() {
     matrixStack.push( mat4.clone(modelview) );
 }
 
-
 /**
  *  Restore the modelview matrix to a value popped from the matrix stack.
  */
@@ -473,7 +402,6 @@ function popMatrix() {
     modelview = matrixStack.pop();
 }
 
-<!-- As is no changes -->
 /**
  *  Create one of the basic objects.  The modelData holds the data for
  *  an IFS using the structure from basic-objects-IFS.js.  This function
@@ -629,18 +557,12 @@ function initGL() {
         gl.uniform4f( u_lights[i].position, 0, 0, 1, 0 );        
         gl.uniform3f( u_lights[i].color, 1,1,1 ); 
     }
-    
   // Lights are set on in the draw() method
-    
-  
-    
 } // end initGL()
-
 
 
 //--------------------------------- animation framework ------------------------------
 
-    
 var animating = false;
 
 /*
@@ -652,19 +574,10 @@ Trial and error works on the numbers. Graph paper design is more efficient.
 function frame() {
     if (animating) {
         frameNumber += 1;
-        // Positions of the soccer ball       
-        xval += 0.01;
-        yval -= 0.01;
-        // Rotation of kick leg
-        // Not perfect by anymeans but Okay for at least one viewing angle.
-        kval -=.1;
-        if (xval > 8.5 || yval < -8.5) {
-           xval= -0.7;
-           yval= -2.1;
-           kval = 90;
-        }  
-        if (kval < 45) {
-        	kval = 45; // Don't overextend the soccer all
+        if (wheatHeight > 5.0) {
+            wheatHeight -= 0.01;
+        } else {
+            wheatHeight = 9.0
         }
         draw();
         requestAnimationFrame(frame);
@@ -708,25 +621,14 @@ function init() {
         return;
     }
     document.getElementById("animCheck").checked = false;
-    document.getElementById("reset").onclick = function() {
-       rotator.setView(17,[0,1,2]);
-       frameNumber = 0;
-       // Initialize soccer ball positions      
-       xval = -0.7; 
-       yval = -2.1;      
-       animating = false;
-       document.getElementById("animCheck").checked = false;
-       draw();
-    }
     
     // Not really using all of these
-    // As you create your scene use these or create from primitives
-    torus = createModel(uvTorus(0.5,1,16,8));   // Create all the basic objects.
+    //torus = createModel(uvTorus(0.5,1,16,8));   // Create all the basic objects.
     sphere = createModel(uvSphere(1));
     cone = createModel(uvCone(),[0,0,.5]);
     cylinder = createModel(uvCylinder(),[0,0,1.5]);
-    disk = createModel(uvCylinder(5.5,0.5,64),[0,0,.25]);
-    ring = createModel(ring(3.3,4.8,40));
+    //disk = createModel(uvCylinder(5.5,0.5,64),[0,0,.25]);
+    //ring = createModel(ring(3.3,4.8,40));
     cube = createModel(cube());
  
  // This controls the zoom and initial placement
@@ -741,17 +643,16 @@ function init() {
 </head>
 <body onload="init()">
 
-<h2>Kicking the soccer Ball</h2>
+<h2>Scarecrow in a Field</h2>
 
 
 <noscript><hr><h3>This page requires Javascript and a web browser that supports WebGL</h3><hr></noscript>
 
 <p id="message" style="font-weight:bold">Drag your mouse on the model to rotate it.<br>
-Make sure to try the animation, and let it run long enough to see the nighttime view!</p>
+Make sure to try the animation, and let it run long enough to see the wheat grow!</p>
 
 <p>
-   <label><input type="checkbox" id="animCheck" onchange="setAnimating(this.checked)">Kick Ball</label>
-   <button id="reset" style="margin-left:40px">Reset</button>
+   <label><input type="checkbox" id="animCheck" onchange="setAnimating(this.checked)">Animate</label>
 </p>
 
 
